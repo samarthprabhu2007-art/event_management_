@@ -1,5 +1,6 @@
 const grid = document.querySelector('#event-grid');
 const dialog = document.querySelector('#dialog');
+const dialogForm = document.querySelector('#dialog-form');
 const content = document.querySelector('#dialog-content');
 const toast = document.querySelector('#toast');
 let allEvents = [];
@@ -39,11 +40,13 @@ function render() {
   grid.querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', () => showEdit(button.dataset.edit)));
 }
 function openModal(html) { content.innerHTML = html; dialog.showModal(); }
+dialogForm.addEventListener('submit', event => event.preventDefault());
+dialogForm.querySelector('.close').addEventListener('click', () => dialog.close());
 document.querySelector('#add-event').addEventListener('click', () => showEventForm());
 function showEventForm(event = null) {
   const value = event ? new Date(event.date) : new Date(Date.now() + 86400000);
   const local = new Date(value.getTime() - value.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-  openModal(`<div class="modal-eyebrow">MAKE IT HAPPEN</div><h2 class="modal-title">${event ? 'Edit your event' : 'Host an event'}</h2><div class="field"><label for="event-title">EVENT NAME</label><input id="event-title" maxlength="120" required placeholder="e.g. The little campus book swap" value="${event ? escapeHTML(event.title) : ''}"></div><div class="field"><label for="event-date">DATE & TIME</label><input id="event-date" type="datetime-local" required value="${local}"></div><div class="field"><label for="event-capacity">HOW MANY SPOTS?</label><input id="event-capacity" type="number" min="1" max="100000" required value="${event ? event.capacity : 30}"></div><button class="modal-submit" id="save-event">${event ? 'Save changes' : 'Add to the calendar'}</button>${event ? '<button class="modal-submit cancel-btn" style="margin-top:8px" id="delete-event">Delete event</button>' : ''}`);
+  openModal(`<div class="modal-eyebrow">MAKE IT HAPPEN</div><h2 class="modal-title">${event ? 'Edit your event' : 'Host an event'}</h2><div class="field"><label for="event-title">EVENT NAME</label><input id="event-title" maxlength="120" required placeholder="e.g. The little campus book swap" value="${event ? escapeHTML(event.title) : ''}"></div><div class="field"><label for="event-date">DATE & TIME</label><input id="event-date" type="datetime-local" required value="${local}"></div><div class="field"><label for="event-capacity">HOW MANY SPOTS?</label><input id="event-capacity" type="number" min="1" max="100000" required value="${event ? event.capacity : 30}"></div><button type="button" class="modal-submit" id="save-event">${event ? 'Save changes' : 'Add to the calendar'}</button>${event ? '<button type="button" class="modal-submit cancel-btn" style="margin-top:8px" id="delete-event">Delete event</button>' : ''}`);
   document.querySelector('#save-event').addEventListener('click', async () => {
     const title = document.querySelector('#event-title').value;
     const date = document.querySelector('#event-date').value;
@@ -60,7 +63,7 @@ function showEventForm(event = null) {
 function showEdit(id) { const event = allEvents.find(item => item._id === id); if (event) showEventForm(event); }
 function showRegister(id) {
   const event = allEvents.find(item => item._id === id);
-  openModal(`<div class="modal-eyebrow">SAVE YOUR SPOT</div><h2 class="modal-title">You're almost there.</h2><p class="modal-help">${escapeHTML(event.title)} · ${datePart(event.date).full} at ${datePart(event.date).time}<br>Enter your student USN to register. One spot per student.</p><div class="field"><label for="student-usn">STUDENT USN</label><input id="student-usn" maxlength="30" required placeholder="e.g. 1AB23CS001" autocomplete="off"></div><button class="modal-submit" id="confirm-register">Count me in →</button>`);
+  openModal(`<div class="modal-eyebrow">SAVE YOUR SPOT</div><h2 class="modal-title">You're almost there.</h2><p class="modal-help">${escapeHTML(event.title)} · ${datePart(event.date).full} at ${datePart(event.date).time}<br>Enter your student USN to register. One spot per student.</p><div class="field"><label for="student-usn">STUDENT USN</label><input id="student-usn" maxlength="30" required placeholder="e.g. 1AB23CS001" autocomplete="off"></div><button type="button" class="modal-submit" id="confirm-register">Count me in →</button>`);
   document.querySelector('#confirm-register').addEventListener('click', async () => {
     const usn = document.querySelector('#student-usn').value;
     try { await api('/api/registrations', { method: 'POST', body: JSON.stringify({ eventId: id, usn }) }); dialog.close(); notify("You're on the list. See you there!"); await loadEvents(); }
@@ -68,12 +71,12 @@ function showRegister(id) {
   });
 }
 document.querySelector('#my-events').addEventListener('click', () => {
-  openModal('<div class="modal-eyebrow">YOUR CAMPUS PLANS</div><h2 class="modal-title">My registrations</h2><div class="field"><label for="lookup-usn">STUDENT USN</label><input id="lookup-usn" maxlength="30" placeholder="Enter your USN"></div><button class="modal-submit" id="lookup">Show my events</button><div id="registration-results"></div>');
+  openModal('<div class="modal-eyebrow">YOUR CAMPUS PLANS</div><h2 class="modal-title">My registrations</h2><div class="field"><label for="lookup-usn">STUDENT USN</label><input id="lookup-usn" maxlength="30" placeholder="Enter your USN"></div><button type="button" class="modal-submit" id="lookup">Show my events</button><div id="registration-results"></div>');
   document.querySelector('#lookup').addEventListener('click', async () => {
     const usn = document.querySelector('#lookup-usn').value.trim(); const results = document.querySelector('#registration-results');
     try {
       const items = await api(`/api/registrations?usn=${encodeURIComponent(usn)}`);
-      results.innerHTML = items.length ? items.map(item => `<div class="registration-row"><div><b>${escapeHTML(item.event.title)}</b><small>${datePart(item.event.date).full} · ${datePart(item.event.date).time}</small></div><button class="cancel-btn" data-cancel="${item.event._id}">Cancel</button></div>`).join('') : '<p class="modal-help" style="margin-top:16px">No upcoming registrations found for this USN.</p>';
+      results.innerHTML = items.length ? items.map(item => `<div class="registration-row"><div><b>${escapeHTML(item.event.title)}</b><small>${datePart(item.event.date).full} · ${datePart(item.event.date).time}</small></div><button type="button" class="cancel-btn" data-cancel="${item.event._id}">Cancel</button></div>`).join('') : '<p class="modal-help" style="margin-top:16px">No upcoming registrations found for this USN.</p>';
       results.querySelectorAll('[data-cancel]').forEach(button => button.addEventListener('click', async () => {
         try { await api('/api/registrations', { method: 'DELETE', body: JSON.stringify({ eventId: button.dataset.cancel, usn }) }); notify('Registration cancelled.'); await loadEvents(); document.querySelector('#lookup').click(); }
         catch (error) { notify(error.message); }
