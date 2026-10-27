@@ -2,6 +2,12 @@ const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
 
+try {
+  process.loadEnvFile(path.join(__dirname, '.env'));
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
+
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const MONGO_URL = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
