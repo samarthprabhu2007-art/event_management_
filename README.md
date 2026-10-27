@@ -5,11 +5,20 @@ A small event board for campus communities. Browse and search events, publish ev
 ## Run it
 
 1. Install Node.js and MongoDB Community Server.
-2. Start MongoDB locally on `mongodb://127.0.0.1:27017`.
+2. Start MongoDB locally on `mongodb://127.0.0.1:27017`, or set `MONGODB_URI` to your MongoDB Atlas connection string.
 3. Run `npm install` once, then `npm start`.
 4. Open [http://127.0.0.1:3000/](http://127.0.0.1:3000/).
 
 The app uses the `Hack_EventBoard` database. Events and registrations remain in MongoDB after a server restart. No sample events are inserted automatically; create one with **Host an event**.
+
+For Atlas in PowerShell, set the connection string for the current terminal before starting the server:
+
+```powershell
+$env:MONGODB_URI = 'mongodb+srv://USERNAME:PASSWORD@cluster0.example.mongodb.net/'
+npm start
+```
+
+Replace `USERNAME`, `PASSWORD`, and the host with your Atlas values. Keep the real connection string private and do not commit it.
 
 ## API
 

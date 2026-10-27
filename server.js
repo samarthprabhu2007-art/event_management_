@@ -4,7 +4,7 @@ const path = require('path');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const MONGO_URL = 'mongodb://127.0.0.1:27017';
+const MONGO_URL = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
 const DB_NAME = 'Hack_EventBoard';
 app.use(express.json({ limit: '20kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
