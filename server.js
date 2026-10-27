@@ -137,4 +137,4 @@ async function start() {
   await events.createIndex({ date: 1 });
   app.listen(PORT, '127.0.0.1', () => console.log(`Event board running at http://127.0.0.1:${PORT}`));
 }
-start().catch(error => { console.error('Could not start. Ensure MongoDB is running at mongodb://127.0.0.1:27017.', error); process.exit(1); });
+start().catch(error => { console.error('Could not connect to MongoDB. Check MONGODB_URI, network access, and credentials.', error); process.exit(1); });

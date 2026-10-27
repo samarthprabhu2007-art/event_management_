@@ -11,7 +11,7 @@ A small event board for campus communities. Browse and search events, publish ev
 
 The app uses the `Hack_EventBoard` database. Events and registrations remain in MongoDB after a server restart. No sample events are inserted automatically; create one with **Host an event**.
 
-The server loads `.env` directly with Node.js, so no extra package is needed. `.env` is ignored by Git and stays on your computer. You can also set `MONGODB_URI` in the environment to override the file:
+The server loads `.env` directly with Node.js, so no extra package is needed. `.env` is ignored by Git and stays on your computer. The example uses Atlas seed hosts directly, which avoids Node SRV DNS lookup issues. You can also set `MONGODB_URI` in the environment to override the file:
 
 ```powershell
 $env:MONGODB_URI = 'mongodb+srv://USERNAME:PASSWORD@cluster0.example.mongodb.net/'
