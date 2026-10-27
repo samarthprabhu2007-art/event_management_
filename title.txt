@@ -1,0 +1,5 @@
+*6. Event Registration Board* · about 3 h
+Collections: events (title, date, capacity), registrations (eventId, usn).
+- *Must:* a student can register for an event only once (409) and only while seats are left (409 when full).
+- *Must:* show *seats left* on every event; allow a student to cancel their registration.
+- *Stretch:* waiting list; a page listing one student's registrations.

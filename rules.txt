@@ -1,0 +1,200 @@
+# Mini Hackathon: Build Something Real
+
+You now know how to build a full-stack app: a **MongoDB** database, an **Express** server and a **web page** that talks to it. In this hackathon you build something *new* with those skills, working together with an **AI coding agent** (Claude Code).
+
+The agent writes code fast. **Your job is to decide what to build, steer the agent, check its work and understand every part of it.** At the end you will explain your app to the judges.
+
+---
+
+## How it works
+
+| | |
+| :--- | :--- |
+| **Teams** | 2 or 3 people per team, one problem per team |
+| **Time** | Build for about 3 hours, then 5 minutes per team for a demo and questions |
+| **Start from** | Copy the folder `05-student-management-app/snapshot` into a new folder named after your team, and build from there |
+| **Database** | Give your team its own database name, for example `Hack_TeamName`, so teams never overwrite each other |
+| **Stack** | Node.js, Express, MongoDB (`mongodb` driver), plain HTML/CSS/JavaScript. No other npm packages unless a mentor says yes |
+| **Address** | Always `mongodb://127.0.0.1:27017` (not `localhost`) |
+
+### Pick a problem
+
+Problems are ranked from **easy (1) to hard (19)**. Pick one that is a little harder than feels comfortable. A working easy project beats a broken hard one, but a **finished medium project scores higher than a finished easy one** (see "How you are judged").
+
+You can also **bring your own idea** (problem 20). Pitch it to a mentor first.
+
+---
+
+## Working with the agent: 7 habits that win
+
+1. **Plan before you code.** First ask the agent: *"Read this repo. Propose the collections, the API routes and the pages for my problem. Do not write code yet."* Read the plan and fix it.
+2. **Small steps.** Build one feature at a time: *"Add the POST route with validation"*, not *"build the whole app"*.
+3. **Read every change.** If you cannot explain a piece of code, ask the agent to explain it before you keep it.
+4. **Test every route** in Postman (or the browser) before you move on. Check the status codes: 200, 201, 400, 404, 409.
+5. **Commit after each working feature:** `git add .` then `git commit -m "Add booking route"`.
+6. **Reset the agent when it is lost.** If it makes a mess, `git restore .` and describe the task again, more clearly.
+7. **Give it the rules.** Tell it: use the `mongodb` driver (not Mongoose), convert ids with `ObjectId`, return `{ error: "..." }` JSON, and add no new packages.
+
+---
+
+## Problem statements
+
+Each problem lists what your app **must** do. The **stretch** goals are for bonus points.
+
+### Easy: one collection, the basics
+
+**1. Task Tracker** · about 1.5 h
+A to-do list for a student.
+- **Must:** add, edit, delete tasks (`title`, `status`: todo / doing / done, `priority`, `dueDate`). Filter by status. Mark a task done with one click.
+- **Must:** highlight tasks that are past their due date.
+- **Stretch:** sort by priority; a progress bar showing done vs total.
+
+**2. Contact Book** · about 1.5 h
+A phone directory.
+- **Must:** add, edit, delete contacts (`name`, `phone`, `email`, `favourite`). Search by name or phone.
+- **Must:** phone must be 10 digits and unique (409 if it already exists). Favourite toggle and a favourites-only filter.
+- **Stretch:** group contacts A-Z with section headings.
+
+**3. Library Catalogue** · about 2 h
+- **Must:** add, edit, delete books (`title`, `author`, `isbn` unique, `copies`). Search by title or author.
+- **Must:** show an "Out of stock" label when `copies` is 0; reject negative copies.
+- **Stretch:** filter by author; a "recently added" list.
+
+**4. Expense Tracker** · about 2 h
+- **Must:** add, edit, delete expenses (`title`, `amount`, `category`, `date`). Show the **total**. Filter by category.
+- **Must:** amount must be a positive number; the total comes from the server.
+- **Stretch:** filter by month; total per category.
+
+**5. Notes App** · about 2 h
+- **Must:** add, edit, delete notes (`title`, `body`, `tags` list, `pinned`). Pinned notes always appear first.
+- **Must:** search note text; click a tag to filter by it.
+- **Stretch:** colour labels; sort by last edited.
+
+### Medium: rules, two collections, computed values
+
+**6. Event Registration Board** · about 3 h
+Collections: `events` (`title`, `date`, `capacity`), `registrations` (`eventId`, `usn`).
+- **Must:** a student can register for an event only once (409) and only while seats are left (409 when full).
+- **Must:** show **seats left** on every event; allow a student to cancel their registration.
+- **Stretch:** waiting list; a page listing one student's registrations.
+
+**7. Lab Inventory Manager** · about 3 h
+Collections: `items` (`name`, `total`, `available`), `transactions` (`itemId`, `usn`, `type`: issue / return, `date`).
+- **Must:** issue and return items. `available` changes automatically and never goes below 0 or above `total`.
+- **Must:** warn when an item has 2 or fewer left; show the history of an item.
+- **Stretch:** list who currently holds which item; overdue returns.
+
+**8. Attendance Register** · about 3 h
+Collections: `students`, `attendance` (`date`, `records`: list of `usn` + present/absent).
+- **Must:** mark attendance for a date (one register per date, 409 if it already exists).
+- **Must:** show each student's **attendance percentage**; highlight anyone below 75%.
+- **Stretch:** edit a past register; export as CSV.
+
+**9. Marks and Grades** · about 3 h
+Collections: `students`, `marks` (`usn`, `subject`, `score`).
+- **Must:** enter marks (0 to 100 only). Server computes total, percentage and a **grade** (O, A+, A, B, C, F).
+- **Must:** a **rank list** sorted by percentage, and a "class topper" highlight.
+- **Stretch:** subject-wise topper; a failing-students report.
+
+**10. Canteen Orders** · about 3.5 h
+Collections: `menu` (`name`, `price`, `available`), `orders` (`items`: list of `{menuId, qty}`, `total`, `status`).
+- **Must:** manage the menu. Place an order with several items; the **server calculates the total** (never trust the browser).
+- **Must:** status flow `placed → preparing → ready → collected`. Any other jump is rejected with 400.
+- **Stretch:** an orders board that refreshes every 10 seconds; daily sales total.
+
+**11. Lost and Found Portal** · about 3 h
+- **Must:** post an item (`type`: lost / found, `item`, `location`, `date`, `contact`). Search and filter by type and location.
+- **Must:** the poster can mark an item **resolved**; resolved items are hidden by default with a "show resolved" switch.
+- **Stretch:** suggest possible matches (same location and similar name).
+
+### Medium-hard: real business rules
+
+**12. Room Booking System** · about 4 h
+Collections: `rooms` (`name`, `capacity`), `bookings` (`roomId`, `date`, `start`, `end`, `bookedBy`, `purpose`).
+- **Must:** book a room for a time slot. **Reject overlapping bookings** for the same room and date (409 with the clashing booking in the message).
+- **Must:** a day view showing each room's bookings; cancel a booking.
+- **Stretch:** weekly calendar grid; recurring bookings.
+
+**13. Live Polls** · about 3.5 h
+Collections: `polls` (`question`, `options`: list of `{text, votes}`, `closed`), `votes` (`pollId`, `usn`).
+- **Must:** create a poll; **one vote per USN per poll** (409 on a second vote); results shown as percentage bars that update after voting.
+- **Must:** an admin can close a poll (no more votes).
+- **Stretch:** results refresh automatically; a "most popular poll" list.
+
+**14. Helpdesk Ticket Tracker** · about 4 h
+Collection: `tickets` (`title`, `category`, `priority`, `status`, `history`: list of `{status, note, at}`).
+- **Must:** raise a ticket; status workflow `open → in-progress → resolved → closed`. Every change is added to `history` and shown as a **timeline**.
+- **Must:** filter by status and priority; a summary of counts per status (use MongoDB `aggregate`).
+- **Stretch:** SLA badge for tickets open too long.
+
+**15. Placement Drive Tracker** · about 4 h
+Collections: `companies` (`name`, `minCgpa`, `branches`, `deadline`), `students` (`usn`, `name`, `cgpa`, `branch`), `applications`.
+- **Must:** a student can apply only if **eligible** (CGPA and branch). If not, return 400 with the reason. No duplicate applications (409). Block applications after the deadline.
+- **Must:** show applicant count per company; a company can shortlist applicants.
+- **Stretch:** "companies I am eligible for" page.
+
+### Hard: several moving parts
+
+**16. Quiz Platform (a mini Wayground)** · about 5 h
+Collections: `quizzes` (`title`, `questions`: list of `{text, options, correctIndex}`), `attempts` (`quizId`, `usn`, `score`, `takenAt`).
+- **Must:** create a quiz; take a quiz where the **server never sends the correct answers** to the browser; the server scores the attempt.
+- **Must:** a **leaderboard** (top 10) per quiz; one attempt per USN.
+- **Stretch:** timer per question; question shuffle; an instructor results page.
+
+**17. Timetable Builder with Clash Detection** · about 5 h
+Collection: `slots` (`subject`, `teacher`, `room`, `section`, `day`, `period`).
+- **Must:** add a slot. Reject (409, with the reason) if the **same teacher, room or section** is already used at that day and period.
+- **Must:** a weekly grid view for a chosen section, teacher or room.
+- **Stretch:** "suggest a free period" button; drag and drop to move a slot.
+
+**18. Campus Marketplace with Login** · about 5.5 h
+Collections: `users` (`name`, `usn`, `passwordHash`), `listings` (`title`, `price`, `category`, `ownerId`, `sold`).
+- **Must:** register and log in. Hash passwords with Node's built-in `crypto.scrypt`. No extra packages. Return a random session token.
+- **Must:** anyone can browse and search; **only the owner** can edit or delete a listing (403 otherwise); mark as sold.
+- **Stretch:** "my listings" page; favourites; logout everywhere.
+
+**19. Analytics Dashboard** · about 5 h
+Uses your Student Management data, plus marks if you add them.
+- **Must:** API routes built with MongoDB **aggregation** (`aggregate`): students per branch, average semester, branch with most students, top 5 by marks.
+- **Must:** charts drawn with plain SVG or `<canvas>` (no chart libraries); a CSV download.
+- **Stretch:** date-range filters; compare two branches.
+
+### Bring your own
+
+**20. Your own idea** · any difficulty
+Pitch it to a mentor in 2 minutes. It needs **at least two collections, one real business rule** (like a clash check or an eligibility check) and **search or filter**. A mentor will rate it easy, medium or hard.
+
+---
+
+## Definition of "done"
+
+- [ ] The app runs with `node server.js` and opens at `http://127.0.0.1:3000/`
+- [ ] Your data is in MongoDB and **survives a server restart**
+- [ ] Bad input gives a clear JSON error with the right status code (400 / 404 / 409)
+- [ ] Every Must feature works, and you have tested each route
+- [ ] At least 5 commits with clear messages
+- [ ] A short `README.md` in your folder: what it does, how to run it, your API routes
+
+---
+
+## How you are judged (100 points)
+
+| Points | What |
+| :---: | :--- |
+| 30 | **It works end to end** (every Must feature, data survives a restart) |
+| 20 | **Backend quality** (validation, correct status codes, `ObjectId` handled, unique rules) |
+| 20 | **You understand it.** Judges point at any file or line and ask "what does this do?" |
+| 15 | **Design and usability** of the web page |
+| 10 | **Difficulty and creativity** (harder problems and good extras earn more) |
+| 5 | **Process** (small commits, tested routes, a README) |
+
+Using the agent is expected and encouraged. **Not being able to explain your own app is what loses points.**
+
+---
+
+## For organisers
+
+- **Network:** the AI agent needs a working internet connection and an account for every team. Test this in the venue beforehand. With a weak network, use one laptop per team and keep the rest of the lab offline.
+- **Safety:** each team uses its own database name. Never run `dropDatabase()` on a database that is not yours.
+- **Starter:** you can hand teams a ready folder (a copy of `05-student-management-app/snapshot`) and the `CLAUDE.md` file so the agent follows the lab's rules from the first prompt.
+- **Judging tip:** ask one question per judge: "Show me where the server checks that.", "What happens if I send this wrong data?", "What does `ObjectId` do here?"
